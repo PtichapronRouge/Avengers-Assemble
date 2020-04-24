@@ -7,14 +7,15 @@ MatrixProduct_:
     jle InvalidSize
     xor eax, eax
 
-    xor r8, r8   ; row iterator
+    mov r8, rdi ; row iterator
 
-    ;xor r12, r12 
+    ;xor r12, r12
     xor r13, r13 ; C iterator
+    xor r14, r14
 
 RowIter:
     ; k = 0
-    xor r10, r10
+    mov r10, rdi
     mov r12, rdx ; B iterator
 
 VectIter:
@@ -22,9 +23,8 @@ VectIter:
     xor r9, r9
 
 ColIter:
-    ; r13 = j + r*n = r9 + rdi*r8
-    mov r13, rdi
-    imul r13, r8
+    ; r13 = j + i*n = r9 + rdi*r8
+    mov r13, r14
     add r13, r9
 
     ; C[n*i+j] += A[n*i+k]*B[n*k+j]
@@ -39,17 +39,16 @@ ColIter:
     ; if j < n, repeat
     cmp r9, rdi
     jl ColIter
-    ; else
+
     ; k++
-    inc r10
     add rsi, 4
     ; if k < n, repeat
-    cmp r10, rdi
-    jl VectIter
+    dec r10
+    jnz VectIter
 
-    inc r8
-    cmp r8, rdi
-    jl RowIter
+    add r14, rdi
+    dec r8
+    jnz RowIter
 
 InvalidSize:
     mov eax, 1
