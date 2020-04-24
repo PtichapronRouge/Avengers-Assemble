@@ -30,3 +30,7 @@
 *.exe
 *.out
 *.app
+
+# Side files
+exercises/
+*.pdf
