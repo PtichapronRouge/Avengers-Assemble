@@ -6,7 +6,7 @@ EXEC_NAME = test
 SRC_C = tests.cpp
 OBJ_C = $(SRC_C:.cpp=.o)
 
-SRC_A = scalar.asm norm.asm
+SRC_A = scalar.asm norm.asm matrix_product.asm
 OBJ_A = $(SRC_A:.asm=.o)
 
 test: $(OBJ_C) $(OBJ_A)

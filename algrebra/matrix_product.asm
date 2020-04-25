@@ -5,13 +5,11 @@
 MatrixProduct_:
     cmp rdi, 0
     jle InvalidSize
-    xor eax, eax
 
     mov r8, rdi ; row iterator
 
-    ;xor r12, r12
     xor r13, r13 ; C iterator
-    xor r14, r14
+    mov r14, rdi
 
 RowIter:
     ; k = 0
@@ -20,12 +18,12 @@ RowIter:
 
 VectIter:
     ; j = 0
-    xor r9, r9
+    mov r9, rdi
+    mov r13, r14
 
 ColIter:
-    ; r13 = j + i*n = r9 + rdi*r8
-    mov r13, r14
-    add r13, r9
+    ; r13 = j + i*n = n + (*n) - (n-j)
+    sub r13, r9
 
     ; C[n*i+j] += A[n*i+k]*B[n*k+j]
     mov  eax, [rsi]
@@ -33,12 +31,11 @@ ColIter:
     add  [rcx + r13*4], eax
 
     ; j++
-    inc r9
     add r12, 4
 
     ; if j < n, repeat
-    cmp r9, rdi
-    jl ColIter
+    dec r9
+    jnz ColIter
 
     ; k++
     add rsi, 4
@@ -49,6 +46,9 @@ ColIter:
     add r14, rdi
     dec r8
     jnz RowIter
+
+    xor eax, eax
+    jmp End
 
 InvalidSize:
     mov eax, 1
