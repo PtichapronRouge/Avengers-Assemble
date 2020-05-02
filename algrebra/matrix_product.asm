@@ -5,8 +5,9 @@ MatrixProduct_:
     ; save callee-saved buffers
     push r14
     push r15
-    ; erase temp buffers
-    xor r15, r15
+    ; r15 = n*4
+    mov r15, rdi
+    imul r15, 4
     ; save save B start address
     mov r14, rdx
 
@@ -32,14 +33,14 @@ ColIter:
     mov eax, [rsi]
     imul eax, [rdx]
     ; C[i,j] += eax
-    add [rcx + r15*4], eax
+    add [rcx], eax
 
     ; j++
     inc r9
     ; n*k+j ++
     add rdx, 4
     ; n*i+j ++
-    inc r15
+    add rcx, 4
     ; j < n ?
     cmp r9, rdi
     jl ColIter
@@ -47,7 +48,7 @@ ColIter:
     ; k++
     inc r10
     ; n*i + j -= n
-    sub r15, rdi
+    sub rcx, r15
     ; n*i+k ++
     add rsi, 4
     ; k < n ?
@@ -57,7 +58,7 @@ ColIter:
     ; i++
     inc r8
     ; n*i +j += n
-    add r15, rdi
+    add rcx, r15
     ; i < n ?
     cmp r8, rdi
     jl RowIter
