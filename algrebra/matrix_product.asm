@@ -15,19 +15,20 @@ MatrixProduct_:
     xor r8, r8
 
 RowIter:
+    ; k = 0
+    xor r10, r10
+
+VectIter:
     ; j = 0
     xor r9, r9
 
 ColIter:
-    ; k = 0
-    xor r10, r10
 
     ; r15 = n*i + j
     mov r15, r8
     imul r15, rdi
     add r15, r9
 
-VectIter:
     ; r13 = n*i + k
     mov r13, r8
     imul r13, rdi
@@ -44,17 +45,17 @@ VectIter:
     ; C[i,j] += eax
     add [rcx + r15*4], eax
 
-    ; k++
-    inc r10
-    ; k < n ?
-    cmp r10, rdi
-    jl VectIter
-
     ; j++
     inc r9
     ; j < n ?
     cmp r9, rdi
     jl ColIter
+
+    ; k++
+    inc r10
+    ; k < n ?
+    cmp r10, rdi
+    jl VectIter
 
     ; i++
     inc r8
