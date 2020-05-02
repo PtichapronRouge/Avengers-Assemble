@@ -17,13 +17,14 @@ MatrixProduct_:
 RowIter:
     ; k = 0
     xor r10, r10
+    ; n*k + j = 0
+    xor r14, r14
 
 VectIter:
     ; j = 0
     xor r9, r9
 
 ColIter:
-
     ; r15 = n*i + j
     mov r15, r8
     imul r15, rdi
@@ -34,11 +35,6 @@ ColIter:
     imul r13, rdi
     add r13, r10
 
-    ; r14 = n*k + j
-    mov r14, r10
-    imul r14, rdi
-    add r14, r9
-
     ; eax = A[i,k]*B[k,j]
     mov eax, [rsi + r13*4]
     imul eax, [rdx + r14*4]
@@ -47,6 +43,8 @@ ColIter:
 
     ; j++
     inc r9
+    ; n*k+j ++
+    inc r14
     ; j < n ?
     cmp r9, rdi
     jl ColIter
