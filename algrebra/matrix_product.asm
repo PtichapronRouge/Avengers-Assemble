@@ -4,10 +4,8 @@
 MatrixProduct_:
     ; save callee-saved buffers
     push r14
-    push r15
-    ; r15 = n*4
-    mov r15, rdi
-    imul r15, 4
+    ; rdi = n (4 is size of int)
+    imul rdi, 4
     ; save save B start address
     mov r14, rdx
 
@@ -40,28 +38,27 @@ ColIter:
     ; n*i+j ++
     add rcx, 4
     ; j++
-    dec r9
+    sub r9, 4
     ; j == n ?
     jnz ColIter
 
     ; n*i + j -= n
-    sub rcx, r15
+    sub rcx, rdi
     ; n*i+k ++
     add rsi, 4
     ; k++
-    dec r10
+    sub r10, 4
     ; k == n ? 
     jnz VectIter
 
     ; n*i +j += n
-    add rcx, r15
+    add rcx, rdi
     ; i++
-    dec r8
+    sub r8, 4
     ; i == n ?
     jnz RowIter
 
 End:
     xor eax, eax
-    pop r15
     pop r14
     ret
