@@ -2,14 +2,14 @@
     section .text
 
 NaiveMatrixProduct_:
-    ; prolog
+    ; check n size
+    cmp rdi, 0
+    jle InvalidSize
+
+    ; callee-saved registers
     push r13
     push r14
     push r15
-
-    ;; check n size
-    ;cmp rdi, 0
-    ;jle InvalidSize
 
     ; i = 0
     xor r8, r8
@@ -67,4 +67,8 @@ End:
     pop r15
     pop r14
     pop r13
+    ret
+
+InvalidSize:
+    mov eax, 1
     ret

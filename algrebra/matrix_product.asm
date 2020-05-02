@@ -2,14 +2,14 @@
     section .text
 
 MatrixProduct_:
+    ; check n size
+    cmp rdi, 0
+    jle InvalidSize
     ; rdi = n (4 is size of int)
     imul rdi, 4
     ; save save B start address
     mov r11, rdx
 
-    ;; check n size
-    ;cmp rdi, 0
-    ;jle InvalidSize
 
     ; i = 0, r8 = (n-i)
     mov r8, rdi
@@ -56,6 +56,9 @@ ColIter:
     ; i == n ?
     jnz RowIter
 
-End:
     xor eax, eax
+    ret
+
+InvalidSize:
+    mov eax, 1
     ret
