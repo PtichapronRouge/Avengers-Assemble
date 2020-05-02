@@ -6,8 +6,9 @@ MatrixProduct_:
     push r14
     push r15
     ; erase temp buffers
-    xor r14, r14,
     xor r15, r15
+    ; save save B start address
+    mov r14, rdx
 
     ;; check n size
     ;cmp rdi, 0
@@ -19,27 +20,24 @@ MatrixProduct_:
 RowIter:
     ; k = 0
     xor r10, r10
-    ; n*k + j = 0
-    xor r14, r14
+    ; load B start address
+    mov rdx, r14
 
 VectIter:
     ; j = 0
     xor r9, r9
 
-    mov r15, r8
-    imul r15, rdi
-
 ColIter:
     ; eax = A[i,k]*B[k,j]
     mov eax, [rsi]
-    imul eax, [rdx + r14*4]
+    imul eax, [rdx]
     ; C[i,j] += eax
     add [rcx + r15*4], eax
 
     ; j++
     inc r9
     ; n*k+j ++
-    inc r14
+    add rdx, 4
     ; n*i+j ++
     inc r15
     ; j < n ?
@@ -48,6 +46,8 @@ ColIter:
 
     ; k++
     inc r10
+    ; n*i + j -= n
+    sub r15, rdi
     ; n*i+k ++
     add rsi, 4
     ; k < n ?
@@ -56,6 +56,8 @@ ColIter:
 
     ; i++
     inc r8
+    ; n*i +j += n
+    add r15, rdi
     ; i < n ?
     cmp r8, rdi
     jl RowIter
