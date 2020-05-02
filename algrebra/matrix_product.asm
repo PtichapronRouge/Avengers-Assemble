@@ -1,7 +1,7 @@
-    global MatrixProduct_
+    global IntegerMatrixProduct_
     section .text
 
-MatrixProduct_:
+IntegerMatrixProduct_:
     ; check n size
     cmp rdi, 0
     jle InvalidSize
@@ -10,12 +10,11 @@ MatrixProduct_:
     ; save save B start address
     mov r11, rdx
 
-
     ; i = 0, r8 = (n-i)
     mov r8, rdi
 
 RowIter:
-    ; k = 0, rdi = (n-k)
+    ; k = 0, r10 = (n-k)
     mov r10, rdi
     ; load B start address
     mov rdx, r11
