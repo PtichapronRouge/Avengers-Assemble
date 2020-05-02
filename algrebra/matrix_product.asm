@@ -2,12 +2,10 @@
     section .text
 
 MatrixProduct_:
-    ; save callee-saved buffers
-    push r14
     ; rdi = n (4 is size of int)
     imul rdi, 4
     ; save save B start address
-    mov r14, rdx
+    mov r11, rdx
 
     ;; check n size
     ;cmp rdi, 0
@@ -20,7 +18,7 @@ RowIter:
     ; k = 0, rdi = (n-k)
     mov r10, rdi
     ; load B start address
-    mov rdx, r14
+    mov rdx, r11
 
 VectIter:
     ; j = 0, r9 = (n-j) 
@@ -60,5 +58,4 @@ ColIter:
 
 End:
     xor eax, eax
-    pop r14
     ret
