@@ -1,19 +1,22 @@
 #include <cxxtest/TestSuite.h>
 
-extern "C" int MatrixProduct_(int n, int* m1, int* m2, int* res);
-extern "C" int NaiveMatrixProduct_(int n, int* A, int* B, int* C);
+extern "C" int IntegerMatrixProduct_(int n, int* m1, int* m2, int* res);
+extern "C" int NaiveIntegerMatrixProduct_(int n, int* A, int* B, int* C);
+extern "C" int FloatMatrixProduct_(int n, float* A, float* B, float* C);
 
-void init_matrices(int n, int* A, int* B)
+template <typename T>
+void init_matrices(int n, T* A, T* B)
 {
     for (int i = 0; i < n; ++i) {
         for (int j = 0; j < n; ++j) {
-            A[n*i+j] = i+j;
-            B[n*i+j] = i+j;
+            A[n*i+j] = static_cast<T>(i+j);
+            B[n*i+j] = static_cast<T>(i-j);
         }
     }
 }
 
-void erase_matrices(int n, int* C)
+template <typename T>
+void erase_matrices(int n, T* C)
 {
     for (int i = 0; i < n; ++i) {
         for (int j = 0; j < n; ++j) {
@@ -22,7 +25,8 @@ void erase_matrices(int n, int* C)
     }
 }
 
-void MatrixProductCpp(int n, int* A, int* B, int* res)
+template <typename T>
+void MatrixProductCpp(int n, T* A, T* B, T* res)
 {
     // C function to compute the matrix product
     for (int i = 0; i < n; i++) {
@@ -51,7 +55,7 @@ class AlgebraTest : public CxxTest::TestSuite
             MatrixProductCpp(n, A, B, c_res);
             // Assembly function to compute the matrix product
             erase_matrices(n, asm_res);
-            NaiveMatrixProduct_(n, A, B, asm_res);
+            NaiveIntegerMatrixProduct_(n, A, B, asm_res);
             // asm_res & c_res must be equal
             TS_ASSERT_SAME_DATA(asm_res, c_res, n*n);
         }
@@ -70,14 +74,28 @@ class AlgebraTest : public CxxTest::TestSuite
             MatrixProductCpp(n, A, B, c_res);
             // Assembly function to compute the matrix product
             erase_matrices(n, asm_res);
-            MatrixProduct_(n, A, B, asm_res);
+            IntegerMatrixProduct_(n, A, B, asm_res);
             // asm_res & c_res must be equal
             TS_ASSERT_SAME_DATA(asm_res, c_res, n*n);
         }
 
-        void XtestFloatMatrixProd(void)
+        void testFloatMatrixProd(void)
         {
-            // not yet implemented
+            const int n(20);
+            float A[n*n],
+                  B[n*n],
+                  c_res[n*n],
+                  asm_res[n*n];
+
+            init_matrices<float>(n, A, B);
+
+            erase_matrices<float>(n, c_res);
+            MatrixProductCpp<float>(n, A, B, c_res);
+            // Assembly function to compute the matrix product
+            erase_matrices(n, asm_res);
+            FloatMatrixProduct_(n, A, B, asm_res);
+            // asm_res & c_res must be equal
+            TS_ASSERT_SAME_DATA(asm_res, c_res, n*n);
         }
 };
 

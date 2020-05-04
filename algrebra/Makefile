@@ -10,7 +10,8 @@ UNIT_TESTS = algebra_test.hpp
 #OBJ_C = $(SRC_C:.cpp=.o)
 
 SRC_RUNNER = runner.cpp
-SRC_A = scalar.asm norm.asm matrix_product.asm naive_matrix_product.asm
+SRC_A = scalar.asm norm.asm \
+		matrix_product.asm naive_matrix_product.asm float_matrix_product.asm
 OBJ_A = $(SRC_A:.asm=.o)
 
 test: $(OBJ_A) $(SRC_RUNNER)

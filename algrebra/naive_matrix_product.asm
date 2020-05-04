@@ -1,7 +1,7 @@
-    global NaiveMatrixProduct_
+    global NaiveIntegerMatrixProduct_
     section .text
 
-NaiveMatrixProduct_:
+NaiveIntegerMatrixProduct_:
     ; check n size
     cmp rdi, 0
     jle InvalidSize
