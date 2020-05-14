@@ -5,8 +5,6 @@ FloatDotProduct_:
     ; check n size
     cmp rdi, 0
     jle InvalidSize
-    ; rdi = n, 4 is size of float
-    imul rdi, 4
     ; save B vector start address
     mov r10, rdx
 
@@ -27,12 +25,12 @@ ColIter:
     ; j ++
     add rsi, 4
     add rdx, 4
-    sub r9, 4
+    dec r9
     jnz ColIter
 
     ; i ++
     add rcx, 4
-    sub r8, 4
+    dec r8
     jnz RowIter
 
     xor eax, eax

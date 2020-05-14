@@ -5,8 +5,8 @@ CTEST = cxxtestgen --error-printer
 BUILDIR = build
 SOURCEDIR = src
 
-TEST_NAME = $(BUILDIR)/algebra_runner
-BENCH_NAME = $(BUILDIR)/benchmark
+TEST_NAME = $(BUILDIR)/algebra_runner.bin
+BENCH_NAME = $(BUILDIR)/benchmark.bin
 
 UNIT_TESTS = $(SOURCEDIR)/algebra_test.hpp
 SRC_RUNNER = $(SOURCEDIR)/runner.cpp

@@ -3,6 +3,9 @@
 extern "C" int IntegerMatrixProduct_(int n, int* m1, int* m2, int* res);
 extern "C" int NaiveIntegerMatrixProduct_(int n, int* A, int* B, int* C);
 extern "C" int FloatMatrixProduct_(int n, float* A, float* B, float* C);
+extern "C" int FloatDotProduct_(int n, float* A, float* x, float* y);
+extern "C" int FloatPackedDotProduct_(int n, float* A, float* x, float* y);
+
 
 template <typename T>
 void init_matrices(int n, T* A, T* B)
@@ -96,6 +99,33 @@ class AlgebraTest : public CxxTest::TestSuite
             FloatMatrixProduct_(n, A, B, asm_res);
             // asm_res & c_res must be equal
             TS_ASSERT_SAME_DATA(asm_res, c_res, n*n);
+        }
+
+        void testFloatDotProd(void)
+        {
+            const int n(20);
+            float A[n*n],
+                  x[n],
+                  y_c[n],
+                  y_asm[n];
+                  for (int i = 0; i < n; i++) {
+                      x[i] = i;
+                      for (int j = 0; j < n; j++) {
+                          A[n*i+j] = i+j;
+                      }
+                  }
+
+            // C dot product
+            for (int i = 0; i < n; i++) {
+                y_c[i] = 0;
+                y_asm[i] = 0;
+                int row = n*i;
+                for (int j = 0; j < n; j++) {
+                    y_c[i] += A[row + j]*x[j];
+                }
+            }
+            FloatPackedDotProduct_(n, A, x, y_asm);
+            TS_ASSERT_SAME_DATA(y_asm, y_c, n);
         }
 };
 
