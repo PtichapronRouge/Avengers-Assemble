@@ -2,17 +2,17 @@ CC = g++ -g
 ASS = nasm -felf64
 CTEST = cxxtestgen --error-printer
 
-#EXEC_NAME = test
-TEST_NAME = algebra_runner
+BUILDIR = build
+SOURCEDIR = src
 
-UNIT_TESTS = algebra_test.hpp
-#SRC_C = tests.cpp
-#OBJ_C = $(SRC_C:.cpp=.o)
+TEST_NAME = $(BUILDIR)/algebra_runner
+BENCH_NAME = $(BUILDIR)/benchmark
 
-SRC_RUNNER = runner.cpp
-SRC_A = scalar.asm norm.asm \
-		matrix_product.asm naive_matrix_product.asm float_matrix_product.asm
-OBJ_A = $(SRC_A:.asm=.o)
+UNIT_TESTS = $(SOURCEDIR)/algebra_test.hpp
+SRC_RUNNER = $(SOURCEDIR)/runner.cpp
+
+SRC_A = $(wildcard $(SOURCEDIR)/*.asm)
+OBJ_A = $(patsubst $(SOURCEDIR)/%.asm, $(BUILDIR)/%.o, $(SRC_A))
 
 test: $(OBJ_A) $(SRC_RUNNER)
 	$(CC) -o $(TEST_NAME) $(SRC_RUNNER) $(OBJ_A)
@@ -20,13 +20,8 @@ test: $(OBJ_A) $(SRC_RUNNER)
 $(SRC_RUNNER): 
 	$(CTEST) -o $(SRC_RUNNER) $(UNIT_TESTS)
 
-$(OBJ_A): %.o: %.asm
+$(BUILDIR)/%.o: $(SOURCEDIR)/%.asm
 	$(ASS) $< -o $@
-
-#test: $(OBJ_C) $(OBJ_A)
-	#g++ -o $(EXEC_NAME) $(OBJ_C) $(OBJ_A)
-
-#$(OBJ_C): $(SRC_C)
 
 .PHONY: clean
 clean:
