@@ -11,6 +11,8 @@
 #include <iostream>
 #include <random>
 
+#include "utils.hpp"
+
 extern "C" int IntegerMatrixProduct_(int n, int* m1, int* m2, int* res);
 extern "C" int NaiveIntegerMatrixProduct_(int n, int* A, int* B, int* C);
 extern "C" int FloatMatrixProduct_(int n, float* A, float* B, float* C);
@@ -18,20 +20,6 @@ extern "C" int FloatDotProduct_(int n, float* A, float* x, float* y);
 extern "C" int FloatPackedDotProduct_(int n, float* A, float* x, float* y);
 
 std::random_device GLOBAL_ENGINE;
-
-void random_matrix_init(int n, int m, float* mat, std::normal_distribution<float> dist)
-{
-    for (int i = 0, end = n*m; i < end; i++) {
-        mat[i] = dist(GLOBAL_ENGINE);
-    }
-}
-
-void zero_matrix_initialization(int n, int m, float* mat)
-{
-    for (int i = 0, end = n*m; i < end; i++) {
-        mat[i] = 0;
-    }
-}
 
 int main(int argc, char* argv[])
 {

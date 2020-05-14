@@ -1,4 +1,4 @@
-CC = g++ -g
+CC = g++ -g -std=c++17
 ASS = nasm -felf64
 CTEST = cxxtestgen --error-printer
 

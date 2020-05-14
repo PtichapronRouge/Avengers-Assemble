@@ -1,32 +1,14 @@
 #include <cxxtest/TestSuite.h>
 
+#include "utils.hpp"
+
 extern "C" int IntegerMatrixProduct_(int n, int* m1, int* m2, int* res);
 extern "C" int NaiveIntegerMatrixProduct_(int n, int* A, int* B, int* C);
 extern "C" int FloatMatrixProduct_(int n, float* A, float* B, float* C);
 extern "C" int FloatDotProduct_(int n, float* A, float* x, float* y);
 extern "C" int FloatPackedDotProduct_(int n, float* A, float* x, float* y);
 
-
-template <typename T>
-void init_matrices(int n, T* A, T* B)
-{
-    for (int i = 0; i < n; ++i) {
-        for (int j = 0; j < n; ++j) {
-            A[n*i+j] = static_cast<T>(i+j);
-            B[n*i+j] = static_cast<T>(i-j);
-        }
-    }
-}
-
-template <typename T>
-void erase_matrices(int n, T* C)
-{
-    for (int i = 0; i < n; ++i) {
-        for (int j = 0; j < n; ++j) {
-            C[n*i+j] = 0;
-        }
-    }
-}
+std::random_device GLOBAL_ENGINE;
 
 template <typename T>
 void MatrixProductCpp(int n, T* A, T* B, T* res)
@@ -52,12 +34,14 @@ class AlgebraTest : public CxxTest::TestSuite
                 c_res[n*n],
                 asm_res[n*n];
 
-            init_matrices(n, A, B);
+            std::uniform_int_distribution<> dist(-50, 50);
+            random_matrix_init(n, n, &A[0], dist);
+            random_matrix_init(n, n, &B[0], dist);
+            zero_matrix_init(n, n, &c_res[0]);
+            zero_matrix_init(n, n, &asm_res[0]);
 
-            erase_matrices(n, c_res);
             MatrixProductCpp(n, A, B, c_res);
             // Assembly function to compute the matrix product
-            erase_matrices(n, asm_res);
             NaiveIntegerMatrixProduct_(n, A, B, asm_res);
             // asm_res & c_res must be equal
             TS_ASSERT_SAME_DATA(asm_res, c_res, n*n);
@@ -71,12 +55,14 @@ class AlgebraTest : public CxxTest::TestSuite
                 c_res[n*n],
                 asm_res[n*n];
 
-            init_matrices(n, A, B);
+            std::uniform_int_distribution<> dist(-50, 50);
+            random_matrix_init(n, n, &A[0], dist);
+            random_matrix_init(n, n, &B[0], dist);
+            zero_matrix_init(n, n, &c_res[0]);
+            zero_matrix_init(n, n, &asm_res[0]);
 
-            erase_matrices(n, c_res);
             MatrixProductCpp(n, A, B, c_res);
             // Assembly function to compute the matrix product
-            erase_matrices(n, asm_res);
             IntegerMatrixProduct_(n, A, B, asm_res);
             // asm_res & c_res must be equal
             TS_ASSERT_SAME_DATA(asm_res, c_res, n*n);
@@ -90,12 +76,14 @@ class AlgebraTest : public CxxTest::TestSuite
                   c_res[n*n],
                   asm_res[n*n];
 
-            init_matrices<float>(n, A, B);
+            std::normal_distribution<float> dist(0, 50);
+            random_matrix_init(n, n, &A[0], dist);
+            random_matrix_init(n, n, &B[0], dist);
+            zero_matrix_init(n, n, &c_res[0]);
+            zero_matrix_init(n, n, &asm_res[0]);
 
-            erase_matrices<float>(n, c_res);
             MatrixProductCpp<float>(n, A, B, c_res);
             // Assembly function to compute the matrix product
-            erase_matrices(n, asm_res);
             FloatMatrixProduct_(n, A, B, asm_res);
             // asm_res & c_res must be equal
             TS_ASSERT_SAME_DATA(asm_res, c_res, n*n);
@@ -108,12 +96,9 @@ class AlgebraTest : public CxxTest::TestSuite
                   x[n],
                   y_c[n],
                   y_asm[n];
-                  for (int i = 0; i < n; i++) {
-                      x[i] = i;
-                      for (int j = 0; j < n; j++) {
-                          A[n*i+j] = i+j;
-                      }
-                  }
+            std::normal_distribution<float> dist(0, 50);
+            random_matrix_init(n, n, &A[0], dist);
+            random_matrix_init(n, 1, &x[0], dist);
 
             // C dot product
             for (int i = 0; i < n; i++) {
