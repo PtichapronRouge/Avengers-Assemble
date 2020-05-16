@@ -1,4 +1,5 @@
 #include <cxxtest/TestSuite.h>
+#include <iostream>
 
 #include "utils.hpp"
 
@@ -91,7 +92,7 @@ class AlgebraTest : public CxxTest::TestSuite
 
         void testFloatDotProd(void)
         {
-            const int n(20);
+            const int n(5);
             float A[n*n],
                   x[n],
                   y_c[n],
@@ -109,7 +110,7 @@ class AlgebraTest : public CxxTest::TestSuite
                     y_c[i] += A[row + j]*x[j];
                 }
             }
-            FloatPackedDotProduct_(n, A, x, y_asm);
+            std::cout << FloatPackedDotProduct_(n, A, x, y_asm) << std::endl;
             TS_ASSERT_SAME_DATA(y_asm, y_c, n);
         }
 };
