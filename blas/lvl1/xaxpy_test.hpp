@@ -98,33 +98,17 @@ public:
         TS_ASSERT_EQUALS(status_m1, 1);
     }
 
-    void XtestSAXPY_notAligned(void)
+    void testSAXPY_notAligned(void)
     {
         const int n(20);
-        float x[n];
-
-        // test return type when x aligned on 16k + 8
-        int nalign_x_8 = SAXPY_(n, 1.0, &x[0]+8, 1, &x[0], 1);
-        TS_ASSERT_EQUALS(nalign_x_8, 2);
-
-        // test return type when y aligned on 16.k + 8
-        int nalign_y_8 = SAXPY_(n, 1.0, &x[0]+8, 1, &x[0], 1);
-        TS_ASSERT_EQUALS(nalign_y_8, 2);
-
-        // test return type when x aligned on 16.k + 4
-        int nalign_x_4 = SAXPY_(n, 1.0, &x[0]+4, 1, &x[0], 1);
-        TS_ASSERT_EQUALS(nalign_x_4, 2);
-
-        // test return type when y aligned on 16.k + 4
-        int nalign_y_4 = SAXPY_(n, 1.0, &x[0], 1, &x[0]+4, 1);
-        TS_ASSERT_EQUALS(nalign_y_4, 2);
+        alignas(16) float x[n];
 
         // test return type when x aligned on 16.k + 3
-        int nalign_x_3 = SAXPY_(n, 1.0, &x[0]+3, 1, &x[0], 1);
+        int nalign_x_3 = SAXPY_(n-3, 1.0, &x[0]+3, 1, &x[0], 1);
         TS_ASSERT_EQUALS(nalign_x_3, 2);
 
         // test return type when y aligned on 16.k + 3
-        int nalign_y_3 = SAXPY_(n, 1.0, &x[0], 1, &x[0]+3, 1);
+        int nalign_y_3 = SAXPY_(n-3, 1.0, &x[0], 1, &x[0]+3, 1);
         TS_ASSERT_EQUALS(nalign_y_3, 2);
     }
 };
