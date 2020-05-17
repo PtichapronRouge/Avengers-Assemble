@@ -13,10 +13,20 @@ SAXPY_:
     test rcx, 0x0f
     jnz NotAligned; jump if y is not aligned
 
+; multiply strides by 4 = sizeof(float)
+    shl rdx, 2
+    shl r8, 2
+
+; When stride is > 1, jump directly to RemIter, packed operations impossible ?
+    cmp edx, 4
+    jg RemIter
+    cmp r8d, 4
+    jg RemIter
+
 ; computes euclidean division of n by 4 (for AVX-2)
-    mov r10d, edi
-    and r10d, 0x3   ; r10d = n%4
-    shr edi, 2      ; edi = n/4
+    mov eax, edi
+    and edi, 0x3   ; edi = n%4
+    shr eax, 2     ; eax = n/4
     jz RemIter
 
 ; broadcast a and saves it
@@ -34,21 +44,21 @@ QuoIter:
     vmovaps [rcx], xmm1      ; y <- a*x + y
     add rcx, 16
 ; decrease counter
-    dec edi
+    dec eax
     jnz QuoIter
 
-    test r10d, r10d
+    test edi, edi
     jz Done
 
 RemIter:
 ; perform computation (scalar)
     vmulss xmm1, xmm0, [rsi] ; xmm1 = a*x
-    add rsi, 4
+    add rsi, rdx
     vaddss xmm1, xmm1, [rcx] ; xmm1 = a*x + y
     vmovss [rcx], xmm1        ; y <- a*x + y
-    add rcx, 4
+    add rcx, r8
 ; decrease counter
-    dec r10d
+    dec edi
     jnz RemIter
 
 Done:

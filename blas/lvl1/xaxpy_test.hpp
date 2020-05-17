@@ -49,7 +49,7 @@ public:
         float   x[n],
                 y[n],
                 c_y[n];
-        float alpha = 1;
+        float alpha = 3.0;
         std::normal_distribution<float> dist(0, 50);
 
         random_matrix_init(n, 1, &x[0], dist);
@@ -110,6 +110,34 @@ public:
         // test return type when y aligned on 16.k + 3
         int nalign_y_3 = SAXPY_(n-3, 1.0, &x[0], 1, &x[0]+3, 1);
         TS_ASSERT_EQUALS(nalign_y_3, 2);
+    }
+
+    void testSAXPY_strided(void)
+    {
+        const int n(23);
+        const int incx = 2,
+                  incy = 3;
+        const int XSIZE = n*incx,
+                  YSIZE = n*incy;
+        float   x[XSIZE],
+                y[YSIZE],
+                c_y[YSIZE];
+        float alpha = 1;
+        std::normal_distribution<float> dist(0, 50);
+
+        random_matrix_init(XSIZE, 1, &x[0], dist);
+        random_matrix_init(YSIZE, 1, &y[0], dist);
+        for(int i = 0; i < YSIZE; i++){
+            c_y[i] = y[i];
+        }
+
+        for(int i = 0; i < n; i++){
+            c_y[i*incy] = alpha*x[i*incx] + y[i*incy];
+        }
+        int status = SAXPY_(n, alpha, x, incx, y, incy);
+
+        TS_ASSERT_EQUALS(status, 0);
+        TS_ASSERT_SAME_DATA(y, c_y, YSIZE*sizeof(float));
     }
 };
 
