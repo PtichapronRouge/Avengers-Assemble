@@ -2,7 +2,6 @@
     section .text
 
 ; SAXPY_(N, a, x, sx, y, sy) : y <- ax + y
-; strides are currently not handled
 ; edi, xmm0, esi, rdx, rcx, r8
 SAXPY_:
 ; Validate arguments
@@ -34,14 +33,13 @@ SAXPY_:
 
 QuoIter:
 ; load data and increase address
-    vmovaps xmm1, [rsi]      ; xmm1 = x[127:0]
-    vmovaps xmm2, [rcx]      ; xmm2 = y[127:0]
-    add rsi, 16
+    vmovaps xmm2, [rcx]             ; xmm2 = y[127:0]
 ; perform actual operation (packed)
-    vmulps xmm1, xmm0, xmm1  ; xmm1 = a*x[127:0]
-    vaddps xmm1, xmm1, xmm2  ; xmm1 = a*x + y
+    vfmadd231ps xmm2, xmm0, [rsi]   ; xmm2 = a*x + y
+    add rsi, 16
+
 ; save result
-    vmovaps [rcx], xmm1      ; y <- a*x + y
+    vmovaps [rcx], xmm2             ; y <- a*x + y
     add rcx, 16
 ; decrease counter
     dec eax
@@ -52,10 +50,11 @@ QuoIter:
 
 RemIter:
 ; perform computation (scalar)
-    vmulss xmm1, xmm0, [rsi] ; xmm1 = a*x
+    vmovss xmm1, [rcx]              ; xmm1 = y
+    vfmadd231ss xmm1, xmm0, [rsi]   ; xmm1 = a*x + y
     add rsi, rdx
-    vaddss xmm1, xmm1, [rcx] ; xmm1 = a*x + y
-    vmovss [rcx], xmm1        ; y <- a*x + y
+; save result
+    vmovss [rcx], xmm1              ; y <- a*x + y
     add rcx, r8
 ; decrease counter
     dec edi
