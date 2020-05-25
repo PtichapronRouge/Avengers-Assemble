@@ -16,8 +16,6 @@
 
 extern "C" int SAXPY_(int n, float alpha, float* x, int sx, float* y, int sy);
 
-std::random_device GLOBAL_ENGINE;
-
 class XAXPYTest : public CxxTest::TestSuite
 {
 public:
