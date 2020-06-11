@@ -36,7 +36,7 @@ QuoIter:
     add rcx,  16
     vfmadd231ps xmm0, xmm1, xmm2
 
-    dec eac
+    dec eax
     jnz QuoIter
 
     vhaddps xmm0, xmm0
