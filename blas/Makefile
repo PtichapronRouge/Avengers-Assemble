@@ -16,10 +16,10 @@ UNIT_TESTS = $(wildcard $(ASM_DIRS)/*_test.hpp)
 RUNNER = $(RUNNER_DIR)/runner.cpp
 
 SRC_A = $(wildcard $(ASM_DIRS)/*.asm)
-OBJ_A = $(patsubst $(ASM_DIRS)/%.asm, $(BUILD_DIR)/%.o, $(SRC_A))
+OBJ_A = $(SRC_A:$(ASM_DIRS)/%.asm=$(BUILD_DIR)/%.o)
 
 SRC_C = $(SRC_DIR)/global.cpp
-OBJ_C = $(patsubst $(SRC_DIR)/%.cpp, $(BUILD_DIR)/%.o, $(SRC_C))
+OBJ_C = $(SRC_C:$(SRC_DIR)/%.cpp=$(BUILD_DIR)/%.o)
 
 .PHONY: all clean clearexec setup fresh
 all: test
