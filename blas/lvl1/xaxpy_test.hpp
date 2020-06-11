@@ -19,40 +19,30 @@ extern "C" int SAXPY_(int n, float alpha, float* x, int sx, float* y, int sy);
 class XAXPYTest : public CxxTest::TestSuite
 {
 public:
-    void compareArrays( int n, float alpha,
-                        float* x, int incx,
-                        float* y, int incy,
-                        float tolerance = 1e-6)
+    static void c_saxpy(int n, float alpha, float* x, int sx, float* y, int sy, float* res)
     {
-        float ref_norm(0.0),
-              asm_norm(0.0);
-
-        auto square = [] (float x) {return x*x;};
-
         for (int i = 0; i < n; i++) {
-            ref_norm += square(alpha*x[i*incx] + y[i*incy]);
+            res[i] = alpha * x[i*sx] + y[i*sy];
         }
-        int status = SAXPY_(n, alpha, x, incx, y, incy);
-        for (int i = 0; i < n; i++) {
-            asm_norm += square(y[i*incy]);
-        }
-
-        TS_ASSERT_EQUALS(status, 0);
-        TS_ASSERT_DELTA((asm_norm - ref_norm)/ref_norm, 0.0, tolerance);
     }
 
     void testSAXPY_multipleOf4(void)
     {
-        const float alpha = 1;
+        const float alpha = 1.0;
         const int n(20);
         float   x[n],
-                y[n];
+                y[n],
+                c_y[n];
 
         std::normal_distribution<float> dist(0, 50);
         random_matrix_init(n, 1, &x[0], dist);
         random_matrix_init(n, 1, &y[0], dist);
 
-        compareArrays(n, alpha, &x[0], 1, &y[0], 1);
+        VectCmpParams params;
+        params.n(n).y(y).c_y(c_y);
+
+        testBlas(SAXPY_, c_saxpy, params,
+                 n, alpha, x, 1, y, 1);
     }
 
     void testSAXPY_notMultipleOf4(void)
@@ -60,13 +50,18 @@ public:
         const float alpha = 3.0;
         const int n(23);
         alignas(16) float   x[n],
-                            y[n];
+                            y[n],
+                            c_y[n];
 
         std::normal_distribution<float> dist(0, 50);
         random_matrix_init(n, 1, &x[0], dist);
         random_matrix_init(n, 1, &y[0], dist);
 
-        compareArrays(n, alpha, &x[0], 1, &y[0], 1);
+        VectCmpParams params;
+        params.n(n).y(y).c_y(c_y);
+
+        testBlas(SAXPY_, c_saxpy, params,
+                 n, alpha, x, 1, y, 1);
     }
 
     void testSAXPY_lessThan4Elems(void)
@@ -74,13 +69,18 @@ public:
         const float alpha = 1;
         const int n(3);
         alignas(16) float   x[n],
-                            y[n];
+                            y[n],
+                            c_y[n];
 
         std::normal_distribution<float> dist(0, 50);
         random_matrix_init(n, 1, &x[0], dist);
         random_matrix_init(n, 1, &y[0], dist);
 
-        compareArrays(n, alpha, &x[0], 1, &y[0], 1);
+        VectCmpParams params;
+        params.n(n).y(y).c_y(c_y);
+
+        testBlas(SAXPY_, c_saxpy, params,
+                 n, alpha, x, 1, y, 1);
     }
 
     void testSAXPY_invalidSize(void)
@@ -118,13 +118,18 @@ public:
         const int XSIZE = n*incx,
                   YSIZE = n*incy;
         float   x[XSIZE],
-                y[YSIZE];
+                y[YSIZE],
+                c_y[YSIZE];
 
         std::normal_distribution<float> dist(0, 50);
         random_matrix_init(XSIZE, 1, &x[0], dist);
         random_matrix_init(YSIZE, 1, &y[0], dist);
 
-        compareArrays(n, alpha, &x[0], incx, &y[0], incy);
+        VectCmpParams params;
+        params.n(n).y(y).c_y(c_y);
+
+        testBlas(SAXPY_, c_saxpy, params,
+                 n, alpha, x, 1, y, 1);
     }
 };
 
